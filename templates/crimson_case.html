@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Styles for this room are now in static/css/style.css, potentially using .room-crimson-case class #}
+{% endblock %}
+
+{% block content %}
+{# Add parent class for room-specific CSS scoping #}
+<section class="escape-room-content room-crimson-case" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-search"></i> {{ room.name }} <i class="fas fa-user-secret"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-users"></i> Players: {{ room.players }}</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>You're a private eye in a rain-slicked city. A dame walked in with a case colder than yesterday's coffee – a missing necklace, the "Crimson Tear". The only lead is the ransacked office of the prime suspect. Find the necklace before the trail goes cold.</p>
+    <hr class="divider">
+
+    {# --- Main Puzzle Interaction Area --- #}
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Surveying the scene...</div>
+        <div id="puzzle-display">
+             <!-- Visual content will be loaded here by JavaScript -->
+             <p style="text-align:center; padding: 50px; color: #aaa;">Examining the office...</p>
+        </div>
+        <div id="input-area" style="display: none;">
+             <!-- Text input elements will be loaded here if needed by JS -->
+        </div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+     {# --- End Puzzle Area --- #}
+
+    <hr class="divider">
+
+     {# --- Completion Trigger (Initially Hidden) --- #}
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Case Closed! Necklace Found!</h3>
+         <p>You found the Crimson Tear hidden away. Another case cracked in the city that never sleeps.</p>
+         {# Form posts to the Flask route to record completion #}
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">REPORT FINDINGS</span>
+                <span class="button-icon"><i class="fas fa-file-alt"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link the specific JS file for this room, using variable passed from Flask route #}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

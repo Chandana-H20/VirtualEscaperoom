@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title | default('Cipher Escape') }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    {% block background %}
+    <div class="background-container">
+        <canvas id="background-canvas"></canvas>
+    </div>
+    {% endblock %}
+    <div class="overlay"></div>
+
+    <div class="content-container">
+        <header class="main-header">
+            <div class="logo">
+                <a href="{{ url_for('index') if not g.user else url_for('rooms') }}" class="logo-link" aria-label="Cipher Escape Home">
+                    <div class="logo-lock"><i class="fas fa-lock"></i></div>
+                    <span class="site-title">CIPHER ESCAPE</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                {% if g.user %}
+                    <a href="{{ url_for('rooms') }}" class="nav-link {% if request.endpoint == 'rooms' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('leaderboard') }}" class="nav-link {% if request.endpoint == 'leaderboard' %}active{% endif %}">
+                        <i class="fas fa-trophy"></i> Leaderboard
+                    </a>
+                    <div class="nav-avatar">
+                         <img src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="{{ g.user.username }}'s avatar" title="Welcome, {{ g.user.username }}">
+                    </div>
+                     <a href="{{ url_for('logout') }}" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link {% if request.endpoint == 'login' %}active{% endif %}">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                     <a href="{{ url_for('register') }}" class="nav-link {% if request.endpoint == 'register' %}active{% endif %}">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                {% endif %}
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages-container">
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <main class="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer class="main-footer">
+             <div class="footer-content">
+                <div class="social-links">
+                    <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/three.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/background.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
+    {% block body_scripts %}
+    {% endblock %}
+</body>
+</html>

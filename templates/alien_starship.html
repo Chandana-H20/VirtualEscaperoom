@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    <style>
+        /* Alien Starship Theme */
+        .room-alien-starship { background-color: #0c0d21; border-color: #7f00ff; /* Violet */ box-shadow: 0 0 25px rgba(127, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; }
+        .room-alien-starship h2 { color: #a951f7; }
+        .room-alien-starship .room-meta i { color: #c787fe; }
+        .room-alien-starship hr.divider { background: linear-gradient(to right, transparent, rgba(127, 0, 255, 0.4), transparent); }
+        .room-alien-starship #puzzle-frame { border-color: #4c0082; /* Indigo */ background-color: #120c1a; }
+        .room-alien-starship #puzzle-instructions { color: #e0c7fa; }
+        .room-alien-starship #puzzle-display { background-color: #1a142b; border-color: #6a0dad; /* Darker Violet */ }
+        .room-alien-starship .alien-symbol { font-size: 2.5em; padding: 10px; margin: 5px; display: inline-block; border: 1px solid transparent; cursor: pointer; transition: all 0.2s ease; color: #c792ea; /* Light Purple Text */}
+        .room-alien-starship .alien-symbol:hover { background-color: rgba(127, 0, 255, 0.2); border-color: rgba(127, 0, 255, 0.5); transform: scale(1.1); }
+        .room-alien-starship .alien-symbol.selected { background-color: rgba(127, 0, 255, 0.4); border-color: #fff; color: #fff; text-shadow: 0 0 10px #fff;}
+        .room-alien-starship #star-map-coords { font-family: monospace; color: #00e5ff; font-size: 1.2em; }
+        .room-alien-starship .power-conduit { position: absolute; background-color: rgba(0, 229, 255, 0.3); border: 1px solid rgba(0, 229, 255, 0.5); border-radius: 3px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 0 5px rgba(0, 229, 255, 0.3);}
+        .room-alien-starship .power-conduit:hover { background-color: rgba(0, 229, 255, 0.5); transform: scale(1.05); box-shadow: 0 0 15px rgba(0, 229, 255, 0.7);}
+        .room-alien-starship .input-group button { background-color: #7f00ff; color: #fff; }
+        .room-alien-starship .input-group button:hover { background-color: #a951f7; }
+        .room-alien-starship .console-text { font-family: monospace; color: lime; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; white-space: pre-wrap;}
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-alien-starship" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-rocket"></i> {{ room.name }} <i class="fas fa-alien"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>You've awakened on the bridge of an unknown alien starship, hurtling through space. Consoles hum with strange symbols. Decipher the alien technology, activate the warp drive with the correct sequence, and escape before you reach their destination!</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Strange symbols glow on the main viewscreen...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Analyzing bridge systems...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Warp Drive Engaged!</h3>
+         <p>The ship jumps to hyperspace, taking you far from danger. Where you'll end up is another question...</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Escape to Hyperspace</span>
+                <span class="button-icon"><i class="fas fa-meteor"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

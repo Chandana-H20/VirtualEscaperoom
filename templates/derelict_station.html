@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Styles for this room are now in static/css/style.css, potentially using .room-derelict-station class #}
+    {# Link Orbitron font if not done in base.html #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{# Add parent class for room-specific CSS scoping #}
+<section class="escape-room-content room-derelict-station" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-satellite-dish"></i> {{ room.name }} <i class="fas fa-user-astronaut"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-users"></i> Players: {{ room.players }}</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>You've docked with Station Kepler-7b, but it's eerily silent. Life support is failing. Restore primary systems and discover what happened to the crew before the station becomes your tomb.</p>
+    <hr class="divider">
+
+    {# --- Main Puzzle Interaction Area --- #}
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Loading system status...</div>
+        <div id="puzzle-display">
+             <!-- Visual content will be loaded here by JavaScript -->
+             <p style="text-align:center; padding: 50px; color: #aaa;">Initializing display...</p>
+        </div>
+        <div id="input-area" style="display: none;">
+             <!-- Text input elements will be loaded here if needed by JS -->
+        </div>
+        <div id="terminal-input-line" style="display: none;"> <!-- For Level 4 -->
+            <span id="terminal-prompt">CMD:></span>
+            <input type="text" id="terminal-input" autocomplete="off">
+        </div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+    {# --- End Puzzle Area --- #}
+
+    <hr class="divider">
+
+     {# --- Completion Trigger (Initially Hidden) --- #}
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Systems Restored! Escape Pod Ready!</h3>
+         <p>You've brought the station back from the brink and found the escape route!</p>
+         {# Form posts to the Flask route to record completion #}
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">LAUNCH ESCAPE POD</span>
+                <span class="button-icon"><i class="fas fa-rocket"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link the specific JS file for this room, using variable passed from Flask route #}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

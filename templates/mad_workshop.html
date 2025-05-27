@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    <style>
+        /* Mad Scientist Theme */
+        .room-mad-workshop { background-color: rgba(50, 50, 60, 0.95); border-color: #ff6347; /* Tomato */ box-shadow: 0 0 25px rgba(255, 99, 71, 0.3); font-family: 'Courier New', monospace; }
+        .room-mad-workshop h2 { color: #ff7f50; /* Coral */ }
+        .room-mad-workshop .room-meta i { color: #ffa07a; /* LightSalmon */ }
+        .room-mad-workshop hr.divider { background: linear-gradient(to right, transparent, rgba(255, 99, 71, 0.4), transparent); }
+        .room-mad-workshop #puzzle-frame { border-color: #8b0000; /* DarkRed */ background-color: #2f2f2f; }
+        .room-mad-workshop #puzzle-instructions { color: #f0e68c; /* Khaki */ }
+        .room-mad-workshop #puzzle-display { background-color: #444; border-color: #666; }
+        .room-mad-workshop .chemical-bottle { position: absolute; cursor: pointer; transition: transform 0.2s ease; width: 50px; text-align: center;}
+        .room-mad-workshop .chemical-bottle:hover { transform: scale(1.1); }
+        .room-mad-workshop .chemical-bottle img { max-height: 60px; filter: drop-shadow(2px 2px 2px black); }
+        .room-mad-workshop .chemical-bottle span { display: block; font-size: 0.7em; color: white; margin-top: 2px; }
+        .room-mad-workshop #beaker { width: 100px; height: 150px; border: 3px solid #ccc; border-top: none; border-radius: 0 0 10px 10px; margin: 20px auto; position: relative; background: linear-gradient(to top, var(--beaker-color, transparent) var(--beaker-level, 0%), transparent var(--beaker-level, 0%)); transition: background var(--transition-medium); }
+        .room-mad-workshop #beaker::before { content: ''; position: absolute; top: -3px; left: -10px; right: -10px; height: 10px; background: #ccc; border-radius: 5px / 3px; border: 3px solid #ccc; border-bottom: none;} /* Beaker lip */
+        .room-mad-workshop .wire { position: absolute; border: 2px solid var(--wire-color, gray); background-color: var(--wire-color, gray); height: 4px; cursor: pointer; border-radius: 2px;}
+        .room-mad-workshop .wire.cut { border-style: dashed; background: none; }
+        .room-mad-workshop .input-group button { background-color: #ff6347; color: white; }
+        .room-mad-workshop .input-group button:hover { background-color: #ff7f50; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-mad-workshop" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-flask"></i> {{ room.name }} <i class="fas fa-bolt"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>"Eureka!"... almost! The eccentric Dr. Flinklestein left his workshop mid-experiment. Combine the correct chemicals, repair the malfunctioning Tesla coil, and decipher the formula for his 'Elixir of Brilliance' before the unstable mixture explodes!</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Bubbling sounds and electrical crackles fill the air...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Entering the workshop...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Experiment Successful!</h3>
+         <p>You've stabilized the experiment and synthesized the Elixir! Who knows what wonders (or chaos) it might unleash?</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Secure the Elixir</span>
+                <span class="button-icon"><i class="fas fa-prescription-bottle"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

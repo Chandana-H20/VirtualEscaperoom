@@ -1,0 +1,7 @@
+ #if using custom CLI commands like create-userFlask>=2.0
+Flask-SQLAlchemy>=2.5
+Flask-Migrate>=3.0
+Werkzeug>=2.0
+python-dotenv>=0.19
+Click>=8.0
+Flask-Admin>=1.6.1 # Added Flask-Admin

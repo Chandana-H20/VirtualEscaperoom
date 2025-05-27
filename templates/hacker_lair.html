@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Room-specific styles should now be in style.css, maybe prefixed with .room-hacker-lair #}
+{% endblock %}
+
+{% block content %}
+{# Add class to parent for scoping room-specific CSS if needed #}
+<section class="escape-room-content room-hacker-lair" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-terminal"></i> {{ room.name }} <i class="fas fa-user-secret"></i></h2>
+    <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-users"></i> Players: {{ room.players }}</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p class="puzzle-clue">You've found an entry point into the network of the elusive hacker known only as "Void". Your objective: Navigate their multi-layered defenses, uncover their master plan, and get out before they trace you. Each layer must be bypassed sequentially.</p>
+    <hr class="divider">
+
+    {# --- Level 1: Access Phrase --- #}
+    <div class="puzzle-area" id="puzzle1-area">
+        <h3><i class="fas fa-shield-alt"></i> Level 1: Access Phrase</h3>
+        <p class="puzzle-clue">The first gate requires a decrypted phrase. Standard shift cipher detected.</p>
+        <p>Intercepted Message: <code class="code-block encrypted-text">GSV TIVZG VHXZKV</code></p>
+        <div class="input-group">
+            <label for="puzzle1-answer">Decrypted Phrase:</label>
+            <input type="text" id="puzzle1-answer" placeholder="Enter phrase...">
+            <button data-level="1">CHECK PHRASE</button>
+        </div>
+        <p id="feedback1" class="feedback"></p>
+    </div>
+
+    {# --- Level 2: Port Scan --- #}
+    <div class="puzzle-area locked" id="puzzle2-area">
+         <h3><i class="fas fa-network-wired"></i> Level 2: Identify Open Port</h3>
+         <p class="puzzle-clue">Passed the gate. A quick scan reveals open ports. Void always leaves the backdoor open on a port related to secure web traffic.</p>
+         <code class="code-block">
+Open Ports Found:
+21 (FTP)
+22 (SSH)
+80 (HTTP)
+443 (HTTPS)
+3306 (MySQL)
+8080 (Alt HTTP)
+         </code>
+         <div class="input-group">
+             <label for="puzzle2-answer">Backdoor Port:</label>
+             <input type="text" id="puzzle2-answer" placeholder="Enter port number...">
+             <button data-level="2">CHECK PORT</button>
+         </div>
+         <p id="feedback2" class="feedback"></p>
+    </div>
+
+    {# --- Level 3: Decrypt Password --- #}
+    <div class="puzzle-area locked" id="puzzle3-area">
+        <h3><i class="fas fa-key"></i> Level 3: Decrypt Admin Password</h3>
+        <p class="puzzle-clue">You need the admin password. It's encrypted with a simple substitution cipher. The key seems to be based on the hacker's alias: 'VOID'. (A=V, B=O, C=I, D=D, E=A, F=B, ...)</p>
+        <p>Encrypted Password: <code class="code-block encrypted-text">HVXXFLK</code></p>
+        <p><small>Hint: Map A->V, B->O, C->I, D->D, then E->A, F->B, ... Z->Z for plaintext->ciphertext.</small></p>
+        <div class="input-group">
+             <label for="puzzle3-answer">Decrypted Password:</label>
+             <input type="text" id="puzzle3-answer" placeholder="Enter password...">
+             <button data-level="3">CHECK PASSWORD</button>
+        </div>
+        <p id="feedback3" class="feedback"></p>
+    </div>
+
+     {# --- Level 4: Root Access Key --- #}
+    <div class="puzzle-area locked" id="puzzle4-area">
+         <h3><i class="fas fa-user-cog"></i> Level 4: Root Access Key</h3>
+        <p class="puzzle-clue">Final step! The root access key is displayed on the system monitor. Match the stable key.</p>
+        <p>Monitor Display:</p>
+        <code class="code-block">
+        ACCESS GRANTED :: KEY = AX7-TQ9-LP4
+        SYSTEM STATUS :: OK
+        SESSION ID :: #A8F3E1...
+        </code>
+        <div class="input-group">
+            <label for="puzzle4-answer">Root Key:</label>
+            <input type="text" id="puzzle4-answer" placeholder="Enter key...">
+            <button data-level="4">CONFIRM KEY</button>
+        </div>
+        <p id="feedback4" class="feedback"></p>
+    </div>
+
+    <hr class="divider">
+
+    {# --- Completion Trigger --- #}
+    <div class="completion-section" id="completion-section">
+        <h3><i class="fas fa-check-double"></i> System Fully Compromised!</h3>
+        <p>All security layers bypassed. You have full access and have retrieved Void's plans. Time to make your escape!</p>
+        {# Form posts to the Flask route to record completion #}
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">ESCAPE THE LAIR</span>
+                <span class="button-icon"><i class="fas fa-door-open"></i></span>
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link the specific JS file for this room #}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

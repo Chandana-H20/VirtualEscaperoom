@@ -1,0 +1,67 @@
+{# /cipher_escape_project/templates/leaderboard.html #}
+{% extends 'base.html' %}
+{% block title %}Leaderboard - Cipher Escape{% endblock %}
+
+{% block head_extra %}
+    <style>
+        /* Keep leaderboard styles from previous version */
+        .leaderboard-container { max-width: 800px; margin: 40px auto; padding: 30px; background: rgba(26, 31, 44, 0.85); border-radius: 8px; border: 1px solid rgba(0, 255, 255, 0.2); }
+        .leaderboard-container h1 { text-align: center; margin-bottom: 30px; color: var(--primary-color); }
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .leaderboard-table th, .leaderboard-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .leaderboard-table th { color: var(--primary-color); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; background-color: rgba(0, 255, 255, 0.05); }
+        .leaderboard-table td { color: var(--text-light); font-size: 1em; }
+        .leaderboard-table tr:last-child td { border-bottom: none; }
+        .leaderboard-table tr:hover td { background-color: rgba(255, 255, 255, 0.03); }
+        .leaderboard-table td:nth-child(1) { width: 10%; text-align: center; font-weight: bold;} /* Rank */
+        .leaderboard-table td:nth-child(3), .leaderboard-table td:nth-child(4) { text-align: right; } /* Score/Time */
+        .leaderboard-table .current-user td { background-color: rgba(0, 255, 255, 0.1); font-weight: bold; } /* Highlight current user */
+        .user-rank-info { margin-top: 30px; padding: 15px; background: rgba(0, 255, 255, 0.08); border: 1px solid rgba(0, 255, 255, 0.25); border-radius: 5px; text-align: center; }
+        .user-rank-info strong { color: var(--primary-color); }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <h1><i class="fas fa-trophy"></i> Overall Leaderboard</h1>
+
+    {% if top_scores %}
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Total Score</th>
+                    <th>Total Time</th> {# Displaying formatted time #}
+                </tr>
+            </thead>
+            <tbody>
+                {# --- UPDATED LOOP --- #}
+                {% for entry in top_scores %}
+                {# Highlight the current logged-in user #}
+                <tr class="{{ 'current-user' if entry.username == g.user.username else '' }}">
+                     {# loop.index starts at 1 #}
+                    <td>#{{ loop.index }}</td>
+                    <td>{{ entry.username }}</td>
+                    <td>{{ "{:,}".format(entry.total_score) }}</td>
+                    {# Use format_time context processor #}
+                    <td>{{ format_time(entry.total_time) }}</td>
+                </tr>
+                {% endfor %}
+                {# --- END UPDATED LOOP --- #}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No scores recorded yet. Be the first!</p>
+    {% endif %}
+
+    {# Display current user's score, already available via g.user #}
+    {% if g.user %}
+        <div class="user-rank-info">
+            Your Total Score: <strong>{{ "{:,}".format(g.user.get_total_score()) }}</strong>
+            {# Rank calculation can be added here if needed #}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{# /cipher_escape_project/templates/success.html #}
+{% extends 'base.html' %}
+{% block title %}Challenge Complete! - Cipher Escape{% endblock %}
+
+{% block head_extra %}
+    {# Link confetti library if using CDN #}
+    {# <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script> #}
+     <style>
+        /* Styles from previous success.html example */
+        .success-container { text-align: center; padding: 60px 20px; margin-top: 40px; background: rgba(26, 31, 44, 0.85); border-radius: 10px; border: 1px solid var(--success-color); box-shadow: 0 0 40px rgba(40, 167, 69, 0.5); }
+        .success-icon { font-size: 5em; color: var(--success-color); margin-bottom: 25px; animation: bounceIn 1s ease-out; }
+        .success-message h1 { color: #fff; margin-bottom: 20px; font-size: 2.8em; text-shadow: 0 0 10px var(--success-color); }
+        .success-message p { color: var(--text-light); font-size: 1.2em; margin-bottom: 15px; line-height: 1.8; }
+        .success-message p:last-of-type { margin-bottom: 40px; }
+        .success-actions { margin-top: 30px; }
+        .success-actions a { margin: 10px 15px; display: inline-block; }
+        @keyframes bounceIn { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        /* Leaderboard Preview Styles */
+        #leaderboard-preview { margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); opacity: 0; transform: translateY(20px); transition: opacity 1s ease-out 1.5s, transform 1s ease-out 1.5s; max-width: 600px; margin-left: auto; margin-right: auto; }
+        #leaderboard-preview.visible { opacity: 1; transform: translateY(0); }
+        #leaderboard-preview h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 1.8em; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; background: rgba(0, 0, 0, 0.2); }
+        .leaderboard-table th, .leaderboard-table td { padding: 10px 15px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .leaderboard-table th { color: var(--primary-color); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .leaderboard-table td { color: var(--text-light); font-size: 0.95em; }
+        .leaderboard-table tr:last-child td { border-bottom: none; }
+        .leaderboard-table td:nth-child(1) { width: 10%; text-align: center; font-weight: bold;} /* Rank */
+        .leaderboard-table td:nth-child(3) { text-align: right; } /* Score */
+    </style>
+{% endblock %}
+
+{% block content %}
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="success-container">
+        <div class="success-icon"> <i class="fas fa-trophy"></i> </div>
+        <div class="success-message">
+            <h1>Congratulations, {{ user.username }}!</h1>
+            <p>You have successfully escaped all challenges and proven your mastery!</p>
+            <p>Your final score reflects your skill and determination.</p>
+        </div>
+
+        {# --- Leaderboard Preview --- #}
+        <div id="leaderboard-preview">
+            <h2>Overall Top Scores</h2>
+            {% if leaderboard %}
+                <table class="leaderboard-table">
+                    <thead> <tr><th>Rank</th> <th>Player</th> <th>Total Score</th></tr> </thead>
+                    <tbody>
+                        {# --- UPDATED LOOP --- #}
+                        {% for entry in leaderboard %}
+                        <tr>
+                             {# loop.index starts at 1 #}
+                            <td>#{{ loop.index }}</td>
+                            <td>{{ entry.username }}</td>
+                            <td>{{ "{:,}".format(entry.total_score) }}</td>
+                        </tr>
+                        {% endfor %}
+                         {# --- END UPDATED LOOP --- #}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Be the first to set a score!</p>
+            {% endif %}
+        </div>
+        {# --- End Leaderboard Preview --- #}
+
+         <div class="success-actions">
+            <a href="{{ url_for('rooms') }}" class="cta-button">
+                 <span class="button-text">Back to Dashboard</span>
+                 <span class="button-icon"><i class="fas fa-th-large"></i></span>
+            </a>
+            <a href="{{ url_for('leaderboard') }}" class="cta-button secondary">
+                 <span class="button-text">View Full Leaderboard</span>
+                  <span class="button-icon"><i class="fas fa-trophy"></i></span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link confetti library (if using CDN) or local file #}
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="{{ url_for('static', filename='js/success_animation.js') }}" defer></script>
+{% endblock %}

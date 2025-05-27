@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Your Dashboard - Cipher Escape{% endblock %}
+
+{% block head_extra %}
+    <style>
+        /* Badge styles (Ensure these support the default icon) */
+        .user-badges { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-wrap: wrap; gap: 10px; }
+        .badge-icon {
+            display: inline-flex; align-items: center; padding: 6px 12px;
+            background-color: rgba(var(--accent-glow-rgb), 0.2); /* Default style uses accent */
+            border: 1px solid rgba(var(--accent-glow-rgb), 0.5);
+            border-radius: 15px; font-size: 0.85em; color: #ffe8cc;
+            white-space: nowrap; cursor: default; transition: all var(--transition-fast);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+        }
+        .badge-icon:hover {
+            transform: scale(1.05) translateY(-1px);
+            box-shadow: 0 4px 12px rgba(var(--accent-glow-rgb), 0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+            background-color: rgba(var(--accent-glow-rgb), 0.3);
+        }
+        .badge-icon i {
+            margin-right: 6px;
+            color: var(--accent-glow); /* Default icon color */
+            font-size: 1.1em;
+            width: 1.2em; /* Ensure consistent width */
+            text-align: center;
+        }
+        /* Style for badges where definition wasn't found */
+        .badge-icon.unknown-badge {
+            background-color: rgba(108, 117, 125, 0.2); /* Use disabled/grey color */
+            border-color: rgba(108, 117, 125, 0.5);
+            color: #bbb; /* Dimmer text */
+        }
+        .badge-icon.unknown-badge:hover {
+             box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); /* No extra glow */
+             background-color: rgba(108, 117, 125, 0.3);
+             transform: none; /* No scale/translate */
+        }
+        .badge-icon.unknown-badge i {
+            color: #999; /* Dimmer icon color */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <div class="user-info">
+        <img src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="User Avatar" class="dashboard-avatar">
+        <div>
+            <h1>Welcome, {{ user.username }}!</h1>
+            {# --- CORRECTED Badge Display Logic --- #}
+            {% if user_badges %}
+            <div class="user-badges">
+                {% for badge_id in user_badges | sort %} {# Sort for consistent display #}
+                    {# Try to find badge in room-specific or global criteria #}
+                    {% set room_key = badge_id.split('_')[0] if '_' in badge_id else 'all_rooms' %}
+                    {% set badge_data = BADGE_CRITERIA.get(room_key, {}).get(badge_id) or BADGE_CRITERIA.get('all_rooms', {}).get(badge_id) %}
+
+                    {# Determine icon and name #}
+                    {% set icon_class = badge_data.icon if badge_data and badge_data.icon else 'fas fa-medal' %} {# Default Icon #}
+                    {% set badge_name = badge_data.name if badge_data and badge_data.name else (badge_id | replace('_', ' ') | title) %} {# Default Name #}
+                    {% set badge_title = badge_data.name if badge_data else "Badge: " + badge_id %} {# Tooltip #}
+                    {% set extra_class = '' if badge_data else 'unknown-badge' %} {# Class for unknown badges #}
+
+                    {# Display the badge #}
+                    <span class="badge-icon {{ extra_class }}" title="{{ badge_title }}">
+                        <i class="{{ icon_class }}"></i> {{ badge_name }}
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+             {# --- End Badge Display --- #}
+        </div>
+    </div>
+    <div class="dashboard-stats">
+        {# Stats remain the same #}
+        <div class="stat-item"> <span class="stat-label">Rooms Completed</span> <span class="stat-value">{{ total_completed }} / {{ total_rooms }}</span> </div>
+        <div class="stat-item"> <span class="stat-label">Total Score</span> <span class="stat-value">{{ "{:,}".format(user.get_total_score()) }}</span> </div>
+    </div>
+</section>
+
+<section class="rooms-selection dashboard-rooms">
+     {# Room grid remains the same #}
+     <h2>Available Challenges</h2>
+     <div class="room-grid">
+        {% if rooms %}
+            {% for room in rooms %}
+            <div class="room-card {% if not room.is_accessible %}locked{% endif %} {% if room.is_completed %}completed{% endif %}" data-difficulty="{{ room.difficulty }}" data-room-id="{{ room.id }}">
+                 {% set image_path = 'images/' + room.id + '_placeholder.jpg' %}
+                 <div class="room-image" style="background-image: url('{{ url_for('static', filename=image_path) }}'); background-color: #333;">
+                    <div class="room-overlay"></div>
+                     {% if not room.is_accessible %}<div class="lock-icon"><i class="fas fa-lock"></i></div>
+                     {% elif room.is_completed %}<div class="completed-icon"><i class="fas fa-check-circle"></i></div>{% endif %}
+                    <div class="difficulty-badge">{{ room.difficulty | upper }}</div>
+                </div>
+                <div class="room-info">
+                    <h3>{{ room.name }}</h3>
+                    <p class="description">{{ room.description }}</p>
+                     <div class="room-stats"> <div class="stat"><i class="fas fa-user"></i> 1 Player</div> <div class="stat"><i class="fas fa-clock"></i> {{ room.time }} Min</div> </div>
+                    <div class="room-action-area">
+                        {% if room.is_accessible %}
+                            <a href="{{ url_for('start_room', room_id=room.id) }}" class="cta-button room-enter-button {% if room.is_completed %}completed{% endif %}">
+                                <span class="button-text">{% if room.is_completed %}Replay Room{% else %}Start Room{% endif %}</span>
+                                <span class="button-icon"><i class="fas {% if room.is_completed %}fa-redo{% else %}fa-arrow-right{% endif %}"></i></span>
+                            </a>
+                        {% else %}
+                            <div class="locked-message"> <i class="fas fa-lock"></i> Locked {% set prereq_room = ALL_ROOM_DATA.get(room.prerequisite) %} {% if prereq_room %}<small>(Requires '{{ prereq_room.name }}')</small>{% endif %} </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %} <p style="grid-column: 1 / -1; text-align: center;">No challenges found.</p> {% endif %}
+    </div>
+</section>
+{% endblock %}

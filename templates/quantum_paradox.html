@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Styles for this room are now in static/css/style.css, potentially using .room-quantum-paradox class #}
+    {# If using specific fonts like Orbitron, link them here or in base.html #}
+{% endblock %}
+
+{% block content %}
+{# Add parent class for room-specific CSS scoping #}
+<section class="escape-room-content room-quantum-paradox" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-atom"></i> {{ room.name }} <i class="fas fa-infinity"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-users"></i> Players: {{ room.players }}</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p style="font-family: sans-serif;">A temporal distortion threatens to unravel reality! You are inside the Chronos Device control room. Use the console below to stabilize the quantum flux before a paradox consumes everything.</p>
+    <hr class="divider">
+
+    {# --- Terminal Interface --- #}
+    <div id="terminal-container">
+        {# The <pre> tag preserves whitespace and line breaks from the JS output #}
+        <pre id="terminal-output">Initializing Chronos System Interface...</pre>
+        <div id="input-line">
+            <span id="prompt">></span>
+            <input type="text" id="terminal-input" autocomplete="off" autofocus>
+        </div>
+         {# Feedback area specifically for terminal errors/state, if needed differently #}
+         <div id="feedback-area" class="feedback"></div>
+    </div>
+    {# --- End Terminal Interface --- #}
+
+    <hr class="divider">
+
+    {# --- Completion Trigger (Initially Hidden) --- #}
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Paradox Averted!</h3>
+         <p>You've stabilized the timeline and calibrated the return jump! Reality is safe... for now.</p>
+         {# Form posts to the Flask route to record completion #}
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">RETURN TO PRESENT</span>
+                <span class="button-icon"><i class="fas fa-door-open"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link the specific JS file for this room, using variable passed from Flask route #}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

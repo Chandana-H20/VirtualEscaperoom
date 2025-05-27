@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    <style>
+        .room-castle-siege { background-color: rgba(60, 60, 70, 0.95); border-color: #a9a9a9; /* DarkGray */ font-family: 'Georgia', serif; }
+        .room-castle-siege h2 { color: #dcdcdc; /* Gainsboro */ }
+        .room-castle-siege .room-meta i { color: #c0c0c0; /* Silver */ }
+        .room-castle-siege hr.divider { background: linear-gradient(to right, transparent, rgba(169, 169, 169, 0.4), transparent); }
+        .room-castle-siege #puzzle-frame { border-color: #696969; /* DimGray */ background-color: #2e2e3a; }
+        .room-castle-siege #puzzle-instructions { color: #f5f5f5; /* WhiteSmoke */ }
+        .room-castle-siege #puzzle-display { background-color: #464652; border-color: #808080; /* Gray */ }
+        .room-castle-siege .hotspot { border-color: rgba(220, 220, 220, 0.4); background: rgba(220, 220, 220, 0.1); cursor: pointer;}
+        .room-castle-siege .hotspot:hover { border-color: #fff; background: rgba(220, 220, 220, 0.2); }
+        .room-castle-siege .shield { width: 50px; height: 60px; border: 1px solid #aaa; margin: 5px; display: inline-block; cursor: pointer; background-color: #eee; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .room-castle-siege .shield.selected { border: 2px solid gold; }
+        .room-castle-siege .catapult-lever { position: absolute; width: 20px; height: 80px; background: brown; border: 2px solid saddlebrown; cursor: pointer; transform-origin: bottom center;}
+        .room-castle-siege .catapult-lever:hover { background: saddlebrown; }
+        .room-castle-siege .input-group button { background-color: #778899; /* LightSlateGray */ }
+        .room-castle-siege .input-group button:hover { background-color: #a9a9a9; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-castle-siege" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-chess-rook"></i> {{ room.name }} <i class="fas fa-khanda"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>The castle walls are under siege! Enemies breach the outer defenses. As the last knight remaining, you must either decipher the clues left by the king to find the secret escape tunnel or operate the ancient defenses to repel the attack.</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">The sounds of battle echo outside...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Assessing the Keep...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Siege Broken / Escape Successful!</h3>
+         <p>You have either bravely defended the castle or cleverly secured your escape!</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Proceed to Safety</span>
+                <span class="button-icon"><i class="fas fa-door-open"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Styles for this room are now in static/css/style.css, potentially using .room-ancient-tomb class #}
+{% endblock %}
+
+{% block content %}
+{# Add parent class for room-specific CSS scoping #}
+<section class="escape-room-content room-ancient-tomb" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-ankh"></i> {{ room.name }} <i class="fas fa-skull-crossbones"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-users"></i> Players: {{ room.players }}</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>Deep beneath the sands, the air grows heavy with the dust of millennia. Solve the riddles of the ancients to proceed, but beware the Pharaoh's curse.</p>
+    <hr class="divider">
+
+    {# --- Main Puzzle Interaction Area --- #}
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Loading instructions...</div>
+        <div id="puzzle-display">
+            <!-- Visual content will be loaded here by JavaScript -->
+            <p style="text-align:center; padding: 50px; color: #aaa;">Loading puzzle elements...</p>
+        </div>
+        <div id="input-area" style="display: none;">
+             <!-- Text input elements will be loaded here if needed by JS -->
+        </div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+    {# --- End Puzzle Area --- #}
+
+    <hr class="divider">
+
+    {# --- Completion Trigger (Initially Hidden) --- #}
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-gem"></i> Treasure Secured! Curse Avoided!</h3>
+         <p>You've deciphered the secrets and escaped the tomb with the artifact!</p>
+         {# Form posts to the Flask route to record completion #}
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">RETURN TO SURFACE</span>
+                <span class="button-icon"><i class="fas fa-door-open"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    {# Link the specific JS file for this room, using variable passed from Flask route #}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Login - Cipher Escape{% endblock %}
+
+{% block head_extra %}
+    {# Styles for login form are now expected in static/css/style.css #}
+{% endblock %}
+
+{% block content %}
+<section class="login-form-section">
+    <h2><i class="fas fa-user-lock"></i> Member Login</h2>
+    {# The form action includes the 'next' parameter to redirect after successful login #}
+    <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <span class="input-icon"><i class="fas fa-user"></i></span>
+            {# Added value attribute to retain username on error #}
+            <input type="text" id="username" name="username" placeholder="Enter your username" required value="{{ request.form.username or '' }}">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <span class="input-icon"><i class="fas fa-key"></i></span>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="cta-button login-button">
+            <span class="button-text">SECURE LOGIN</span>
+            <span class="button-icon"><i class="fas fa-sign-in-alt"></i></span>
+        </button>
+    </form>
+    <p class="register-link">
+        Don't have an account? <a href="{{ url_for('register') }}">Sign up</a>
+    </p>
+</section>
+{% endblock %}

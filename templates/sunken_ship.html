@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    <style>
+        .room-sunken-ship { background-color: rgba(10, 25, 45, 0.95); border-color: #4682b4; /* SteelBlue */ }
+        .room-sunken-ship h2 { color: #5f9ea0; /* CadetBlue */ }
+        .room-sunken-ship .room-meta i { color: #7fffd4; /* Aquamarine */ }
+        .room-sunken-ship hr.divider { background: linear-gradient(to right, transparent, rgba(70, 130, 180, 0.4), transparent); }
+        .room-sunken-ship #puzzle-frame { border-color: #2f4f4f; /* DarkSlateGray */ background-color: #191970; /* MidnightBlue */ }
+        .room-sunken-ship #puzzle-instructions { color: #add8e6; /* LightBlue */ }
+        .room-sunken-ship #puzzle-display { background-color: #1e2a38; border-color: #6495ed; /* CornflowerBlue */ }
+        .room-sunken-ship .hotspot { border-color: rgba(175, 238, 238, 0.4); background: rgba(175, 238, 238, 0.1); /* PaleTurquoise */ cursor: cell;}
+        .room-sunken-ship .hotspot:hover { border-color: #afeeee; background: rgba(175, 238, 238, 0.25); }
+        .room-sunken-ship .treasure-chest { border: 3px solid peru; background-color: saddlebrown; box-shadow: 5px 5px 10px black;}
+        .room-sunken-ship .lock-dial { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid gray; background: silver; margin: 5px; font-size: 1.2em; border-radius: 50%; cursor: pointer;}
+        .room-sunken-ship .input-group button { background-color: #4682b4; }
+        .room-sunken-ship .input-group button:hover { background-color: #5f9ea0; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-sunken-ship" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-ship"></i> {{ room.name }} <i class="fas fa-skull-crossbones"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>Below the waves lies the wreck of the Sea Serpent. Pirate lore speaks of Captain Blackheart's treasure hidden within. Navigate the decaying galleon, solve the waterlogged puzzles, and claim the chest before the currents shift.</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">The water shifts ominously...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Descending into the depths...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Treasure Recovered!</h3>
+         <p>You pry open the chest, revealing Blackheart's legendary treasure! Time to surface.</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Ascend with Loot</span>
+                <span class="button-icon"><i class="fas fa-water"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

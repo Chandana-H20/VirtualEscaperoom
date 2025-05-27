@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    {# Link specific fonts if needed, e.g., copperplate gothic, serif #}
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap" rel="stylesheet">
+    <style>
+        .room-steampunk-library { font-family: 'IM Fell English', serif; background-color: rgba(70, 50, 30, 0.95); border-color: #b8860b; /* DarkGoldenrod */ }
+        .room-steampunk-library h2 { color: #daa520; /* Goldenrod */ }
+        .room-steampunk-library .room-meta i { color: #cd853f; /* Peru */ }
+        .room-steampunk-library hr.divider { background: linear-gradient(to right, transparent, rgba(184, 134, 11, 0.4), transparent); }
+        .room-steampunk-library #puzzle-frame { border-color: #8b4513; background-color: #3d2b1f; }
+        .room-steampunk-library #puzzle-instructions { color: #f4a460; /* Sandy Brown */ }
+        .room-steampunk-library #puzzle-display { background-color: #5a4a3a; border-color: #a0522d; }
+        .room-steampunk-library .gear { position: absolute; width: 50px; height: 50px; background-image: url('../images/gear_placeholder.png'); background-size: contain; cursor: pointer; transition: transform 0.2s ease-out; }
+        .room-steampunk-library .gear:hover { transform: scale(1.1) rotate(15deg); }
+        .room-steampunk-library .gear.active { filter: drop-shadow(0 0 5px gold); }
+        .room-steampunk-library .book-spine { position: absolute; background-color: rgba(139, 69, 19, 0.7); border: 1px solid saddlebrown; cursor: pointer; transition: background-color 0.2s; }
+        .room-steampunk-library .book-spine:hover { background-color: rgba(160, 82, 45, 0.9); }
+        .room-steampunk-library .pressure-gauge-value { font-size: 1.5em; color: #ffc107; font-weight: bold; }
+        .room-steampunk-library .input-group button { background-color: #b8860b; }
+        .room-steampunk-library .input-group button:hover { background-color: #daa520; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-steampunk-library" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-book"></i> {{ room.name }} <i class="fas fa-cogs"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>Within this grand library of brass and steam, the Automaton Librarian has locked down the archives. Align the celestial clockwork, decipher the pneumatic codes, and reactivate the Great Orrery to uncover the library's hidden knowledge.</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">The faint ticking of gears echoes...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Loading Library View...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Archives Unlocked!</h3>
+         <p>The Great Orrery whirs to life, revealing the path to the requested manuscript.</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Retrieve Manuscript</span>
+                <span class="button-icon"><i class="fas fa-scroll"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}

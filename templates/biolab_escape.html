@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block head_extra %}
+    <style>
+        .room-biolab-escape { background-color: rgba(20, 40, 40, 0.95); border-color: #20c997; /* MediumAquaMarine */ font-family: 'Orbitron', sans-serif; }
+        .room-biolab-escape h2 { color: #66fcf1; /* Brighter Aqua */ }
+        .room-biolab-escape .room-meta i { color: #45a29e; /* Darker Aqua */ }
+        .room-biolab-escape hr.divider { background: linear-gradient(to right, transparent, rgba(32, 201, 151, 0.4), transparent); }
+        .room-biolab-escape #puzzle-frame { border-color: #1f2833; background-color: #0b0c10; }
+        .room-biolab-escape #puzzle-instructions { color: #c5c6c7; /* Light Grey */ }
+        .room-biolab-escape #puzzle-display { background-color: #1f2833; border-color: #45a29e; }
+        .room-biolab-escape .dna-sequence { font-family: monospace; color: #90ee90; word-break: break-all; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;}
+        .room-biolab-escape .sample-tube { width: 30px; height: 80px; border: 2px solid #ccc; border-radius: 5px 5px 15px 15px; display: inline-block; margin: 5px; cursor: pointer; position: relative; background: linear-gradient(to top, var(--liquid-color, #ff00ff) var(--liquid-level, 50%), transparent var(--liquid-level, 50%));}
+        .room-biolab-escape .sample-tube:hover { border-color: white; }
+        .room-biolab-escape .keypad-button { width: 50px; height: 50px; line-height: 50px; text-align: center; background: #444; color: white; border: 1px solid #666; margin: 5px; display: inline-block; cursor: pointer; border-radius: 5px; }
+        .room-biolab-escape .keypad-button:hover { background: #555; }
+        .room-biolab-escape .input-group button { background-color: #20c997; }
+        .room-biolab-escape .input-group button:hover { background-color: #66fcf1; color: #0b0c10; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="escape-room-content room-biolab-escape" data-room-id="{{ room.id }}">
+    <h2><i class="fas fa-vial"></i> {{ room.name }} <i class="fas fa-biohazard"></i></h2>
+     <div class="room-meta">
+        <span><i class="fas fa-brain"></i> Difficulty: {{ room.difficulty | capitalize }}</span> |
+        <span><i class="fas fa-user"></i> 1 Player</span> |
+        <span><i class="fas fa-clock"></i> Time Limit: {{ room.time }} mins</span>
+    </div>
+    <p>Containment breach in Sector Gamma! A volatile pathogen is loose. Analyze the samples, synthesize the counter-agent, and initiate the sterilization protocol before the infection spreads beyond the facility.</p>
+    <hr class="divider">
+
+    <div id="puzzle-frame">
+        <div id="puzzle-instructions">Warning alarms blare...</div>
+        <div id="puzzle-display"> <p style="padding:50px; color:#aaa;">Accessing Lab Systems...</p> </div>
+        <div id="input-area" style="display: none;"></div>
+        <div id="feedback-area" class="feedback"></div>
+    </div>
+
+    <hr class="divider">
+     <div class="completion-section" id="completion-section">
+         <h3><i class="fas fa-check-double"></i> Outbreak Contained!</h3>
+         <p>The counter-agent has neutralized the pathogen, and sterilization protocols are complete. The facility is secure.</p>
+        <form method="POST" action="{{ url_for('complete_room', room_id=room.id) }}">
+            <button type="submit" class="cta-button complete-button">
+                <span class="button-text">Proceed to Decontamination</span>
+                <span class="button-icon"><i class="fas fa-door-closed"></i></span>
+            </button>
+        </form>
+     </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='js/' + room.js_file) }}" defer></script>
+{% endblock %}
